@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lời Mời Khai Phá - Kỷ Yếu 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hsr-gold: #DAB568;
+            --hsr-gold-light: #F4D288;
+            --hsr-blue: #1A2236;
+            --hsr-dark: #0B0E15;
+            --hsr-text: #E6E8EB;
+            --hsr-accent: #5DADE2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background-color: var(--hsr-dark);
+            color: var(--hsr-text);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                radial-gradient(circle at 50% 50%, #1a2236 0%, #000000 100%),
+                url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=2072&auto=format&fit=crop'); 
+            background-blend-mode: overlay;
+            background-size: cover;
+        }
+
+        /* --- BACKGROUND STARS --- */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: transparent;
+        }
+        
+        /* --- WARP SCREEN (Màn hình chờ) --- */
+        #warp-screen {
+            position: absolute;
+            z-index: 100;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+
+        .ticket-container {
+            width: 300px;
+            height: 160px;
+            background: linear-gradient(135deg, #1e1e1e 0%, #3a3a3a 100%);
+            border: 2px solid var(--hsr-gold);
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(218, 181, 104, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .ticket-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(218, 181, 104, 0.8);
+        }
+
+        .ticket-inner {
+            width: 94%;
+            height: 90%;
+            border: 1px dashed var(--hsr-gold);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .astral-logo {
+            font-size: 3rem;
+            color: var(--hsr-gold);
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px var(--hsr-gold);
+        }
+
+        .warp-text {
+            color: var(--hsr-gold-light);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .tap-hint {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* --- FLASH EFFECT --- */
+        #flash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white; /* Màu cầu vồng 5 sao nếu muốn phức tạp hơn */
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* --- MAIN INVITATION CARD --- */
+        #invitation-card {
+            z-index: 50;
+            width: 90%;
+            max-width: 500px;
+            background: rgba(15, 21, 40, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0 20px 0 20px; /* Góc chéo đặc trưng */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            padding: 2rem;
+            position: relative;
+            display: none; /* Ẩn ban đầu */
+            opacity: 0;
+            transform: translateY(20px);
+            backdrop-filter: blur(10px);
+        }
+
+        #invitation-card::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, transparent, var(--hsr-gold), transparent);
+            z-index: -1;
+            border-radius: 0 20px 0 20px;
+            opacity: 0.5;
+        }
+
+        .header-section {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mission-badge {
+            background: var(--hsr-gold);
+            color: var(--hsr-dark);
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            display: inline-block;
+            transform: skew(-15deg);
+            margin-bottom: 10px;
+        }
+        
+        .mission-badge span {
+            display: block;
+            transform: skew(15deg);
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub-title {
+            color: var(--hsr-gold-light);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid var(--hsr-gold);
+        }
+
+        .icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            color: var(--hsr-accent);
+            width: 30px;
+            text-align: center;
+        }
+
+        .info-text strong {
+            display: block;
+            color: var(--hsr-text);
+            font-size: 1rem;
+        }
+
+        .info-text span {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .character-img {
+            position: absolute;
+            right: -60px;
+            top: -50px;
+            width: 150px;
+            opacity: 0.8;
+            pointer-events: none;
+            /* Bạn có thể thay bằng ảnh chibi Pom-pom hoặc nhân vật khác */
+        }
+
+        .action-btn {
+            margin-top: 2rem;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, var(--hsr-gold) 0%, #b88a38 100%);
+            border: none;
+            color: var(--hsr-dark);
+            font-weight: 800;
+            font-size: 1rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 2px 15px 2px 15px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 0 15px var(--hsr-gold);
+        }
+
+        .footer {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #555;
+            letter-spacing: 1px;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            #invitation-card {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            .character-img {
+                width: 100px;
+                right: -20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="https://ia801402.us.archive.org/16/items/ed-sheeran-perfect-official-music-video/Ed%20Sheeran%20-%20Perfect%20%28Official%20Music%20Video%29.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="flash-overlay"></div>
+
+    <div id="warp-screen">
+        <div class="ticket-container" onclick="performWarp()">
+            <div class="ticket-inner">
+                <div class="astral-logo">✦</div>
+                <div class="warp-text">VÉ MỜI ĐẶC BIỆT</div>
+                <div style="font-size: 0.7rem; color: #aaa; margin-top:5px;">Star Rail Pass</div>
+            </div>
+        </div>
+        <div class="tap-hint">Chạm để Khai Phá</div>
+    </div>
+
+    <div id="invitation-card">
+        <div style="position: absolute; top: 10px; right: 10px; color: #fff; font-size: 0.7rem; border: 1px solid #fff; padding: 2px 5px; opacity: 0.5;">NO.2026</div>
+
+        <div class="header-section">
+            <div class="mission-badge"><span>NHIỆM VỤ ĐỒNG HÀNH</span></div>
+            <h1>KỶ YẾU LỚP 12A1</h1>
+            <p class="sub-title">"Hành trình vạn dặm bắt đầu từ hôm nay"</p>
+        </div>
+
+        <div class="content-section">
+            <div class="info-row">
+                <div class="icon">📅</div>
+                <div class="info-text">
+                    <strong>THỜI GIAN</strong>
+                    <span>08:00 Sáng - Chủ Nhật, 20/05/2026</span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="icon">📍</div>
+                <div class="info-text">
+                    <strong>ĐỊA ĐIỂM</strong>
+                    <span>Trường THPT [Tên Trường Của Bạn]</span>
+                    <span>& Phim trường [Tên Phim Trường]</span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="icon">👗</div>
+                <div class="info-text">
+                    <strong>DRESSCODE</strong>
+                    <span>Nam: Vest/Sơ mi trắng - Nữ: Áo dài/Váy</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="action-btn" onclick="confirmAttendance()">
+            ✦ XÁC NHẬN THAM GIA ✦
+        </button>
+
+        <div class="footer">
+            MAY THIS JOURNEY LEAD US STARWARD
+        </div>
+    </div>
+
+    <script>
+        function performWarp() {
+            const warpScreen = document.getElementById('warp-screen');
+            const flash = document.getElementById('flash-overlay');
+            const card = document.getElementById('invitation-card');
+            const music = document.getElementById('bg-music');
+
+            // 1. Chơi nhạc (nếu trình duyệt cho phép)
+            music.volume = 0.5;
+            music.play().catch(e => console.log("Cần tương tác để phát nhạc"));
+
+            // 2. Hiệu ứng rung lắc vé
+            const ticket = document.querySelector('.ticket-container');
+            ticket.style.transform = "scale(0.9)";
+            
+            setTimeout(() => {
+                // 3. Flash sáng (Giả lập màn hình cầu vồng 5 sao)
+                flash.style.transition = "opacity 0.5s ease";
+                flash.style.opacity = "1";
+
+                // Đổi màu nền flash thành màu vàng 5 sao rồi nhạt dần
+                setTimeout(() => {
+                    flash.style.background = "linear-gradient(135deg, #fff 0%, #DAB568 50%, #fff 100%)";
+                }, 200);
+
+                setTimeout(() => {
+                    // 4. Ẩn màn hình warp, hiện thiệp
+                    warpScreen.style.display = 'none';
+                    card.style.display = 'block';
+                    card.style.animation = "slideUp 1s cubic-bezier(0.19, 1, 0.22, 1) forwards";
+                    
+                    // 5. Tắt flash
+                    flash.style.opacity = "0";
+                    setTimeout(() => { flash.style.display = 'none'; }, 500);
+                }, 1500); // Thời gian chờ flash
+            }, 300);
+        }
+
+        function confirmAttendance() {
+            // Thay link Google Form hoặc Facebook của bạn vào đây
+            window.location.href = "https://www.facebook.com/"; 
+            alert("Đang chuyển đến trang đăng ký...");
+        }
+    </script>
+</body>
+</html>
