@@ -2,410 +2,426 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lời Mời Khai Phá - Kỷ Yếu 2026</title>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PROJECT: SINGULARITY // 12A1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --hsr-gold: #DAB568;
-            --hsr-gold-light: #F4D288;
-            --hsr-blue: #1A2236;
-            --hsr-dark: #0B0E15;
-            --hsr-text: #E6E8EB;
-            --hsr-accent: #5DADE2;
+            /* FUSION PALETTE */
+            --c-cyan: #00F0FF;    /* Cyberpunk / Blue Archive */
+            --c-gold: #FFD700;    /* Honkai Star Rail (SSR) */
+            --c-pink: #FF0055;    /* Arknights / Glitch */
+            --c-void: #050505;    /* Deep Space */
+            --c-panel: rgba(15, 20, 25, 0.9); /* Glass Dark */
+            --border: rgba(255, 255, 255, 0.15);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Exo 2', sans-serif;
-            background-color: var(--hsr-dark);
-            color: var(--hsr-text);
-            overflow: hidden;
+            background-color: var(--c-void);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-image: 
-                radial-gradient(circle at 50% 50%, #1a2236 0%, #000000 100%),
-                url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=2072&auto=format&fit=crop'); 
-            background-blend-mode: overlay;
-            background-size: cover;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            position: relative;
         }
 
-        /* --- BACKGROUND STARS --- */
-        .stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            background: transparent;
+        /* --- BACKGROUND FX --- */
+        #matrix-canvas { position: fixed; inset: 0; z-index: 0; opacity: 0.15; pointer-events: none; }
+        .scanlines {
+            position: fixed; inset: 0; z-index: 5; pointer-events: none;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+        }
+        .vignette {
+            position: fixed; inset: 0; z-index: 6; pointer-events: none;
+            background: radial-gradient(circle at center, transparent 40%, #000 120%);
+        }
+
+        /* --- BOOT SCREEN (LOADING) --- */
+        #boot-layer {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .hex-loader {
+            width: 60px; height: 35px; background: var(--c-gold);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            animation: spinHex 1s infinite linear; margin-bottom: 20px;
+            box-shadow: 0 0 20px var(--c-gold);
+        }
+        .boot-text { font-family: 'Share Tech Mono'; color: var(--c-cyan); font-size: 0.9rem; letter-spacing: 2px; }
+
+        /* --- MAIN APP STRUCTURE --- */
+        #app {
+            position: relative; z-index: 10; flex: 1; display: none; flex-direction: column;
+            opacity: 0; transition: opacity 0.8s ease;
+        }
+
+        /* HEADER (HSR STYLE) */
+        .header {
+            height: 70px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--c-gold); position: relative;
+        }
+        .header::after { 
+            content: ''; position: absolute; bottom: -1px; left: 0; height: 1px; width: 30%;
+            background: var(--c-cyan); animation: loadBar 3s infinite alternate;
+        }
+        .h-title { font-family: 'Orbitron'; font-weight: 900; font-size: 1.1rem; letter-spacing: 1px; }
+        .h-badge { font-family: 'Share Tech Mono'; font-size: 0.65rem; color: #000; background: var(--c-gold); padding: 2px 6px; transform: skewX(-15deg); font-weight: bold; }
+
+        /* VIEWPORT (SCROLLABLE) */
+        .viewport { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
+
+        /* --- CARDS & UI ELEMENTS --- */
+        .tech-card {
+            background: var(--c-panel); border: 1px solid var(--border);
+            padding: 20px; margin-bottom: 15px; position: relative;
+            backdrop-filter: blur(5px);
+            /* Arknights/WoT Polygon Clip */
+            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+            transition: transform 0.2s;
+        }
+        .tech-card::before { 
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--c-cyan);
+        }
+        .card-head {
+            font-family: 'Orbitron'; color: var(--c-cyan); margin-bottom: 15px;
+            font-size: 1rem; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px; display: flex; justify-content: space-between;
+        }
+
+        /* GACHA TERMINAL (THE CORE FEATURE) */
+        .terminal-box {
+            text-align: center; border-color: var(--c-cyan);
+            background: radial-gradient(circle at center, rgba(0, 240, 255, 0.05), transparent);
+        }
+        .rarity-badge {
+            font-family: 'Orbitron'; font-size: 2rem; font-weight: 900;
+            margin: 10px 0; text-shadow: 0 0 15px currentColor; color: #555;
+        }
+        .msg-content {
+            font-family: 'Rajdhani'; font-size: 1.1rem; line-height: 1.5; font-style: italic;
+            min-height: 80px; display: flex; align-items: center; justify-content: center;
+            color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.3);
         }
         
-        /* --- WARP SCREEN (Màn hình chờ) --- */
-        #warp-screen {
-            position: absolute;
-            z-index: 100;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 1s ease;
+        .breach-btn {
+            width: 100%; padding: 15px; margin-top: 15px;
+            background: var(--c-pink); color: #fff; border: none;
+            font-family: 'Orbitron'; font-weight: 900; letter-spacing: 2px;
+            clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+            cursor: pointer; position: relative; overflow: hidden;
+            box-shadow: 4px 4px 0px rgba(255,0,85,0.3); transition: 0.2s;
         }
+        .breach-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px rgba(255,0,85,0.3); }
 
-        .ticket-container {
-            width: 300px;
-            height: 160px;
-            background: linear-gradient(135deg, #1e1e1e 0%, #3a3a3a 100%);
-            border: 2px solid var(--hsr-gold);
-            border-radius: 15px;
-            position: relative;
-            box-shadow: 0 0 20px rgba(218, 181, 104, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
+        /* GLITCH FX CLASS */
+        .glitch-text { animation: glitch-anim 0.2s infinite; color: var(--c-pink) !important; text-shadow: 2px 0 #fff, -2px 0 var(--c-cyan); }
 
-        .ticket-container:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(218, 181, 104, 0.8);
+        /* STATS (WOT STYLE) */
+        .stat-row {
+            display: flex; justify-content: space-between; padding: 10px 0;
+            border-bottom: 1px dashed #444; font-size: 0.95rem;
         }
+        .stat-label { color: #888; font-family: 'Share Tech Mono'; }
+        .stat-val { font-weight: bold; font-family: 'Orbitron'; }
 
-        .ticket-inner {
-            width: 94%;
-            height: 90%;
-            border: 1px dashed var(--hsr-gold);
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0,0,0,0.3);
+        /* FORM INPUTS (ARKNIGHTS STYLE) */
+        .cyber-input {
+            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #444;
+            color: var(--c-cyan); padding: 12px; margin-bottom: 10px;
+            font-family: 'Share Tech Mono'; outline: none; transition: 0.3s;
         }
+        .cyber-input:focus { border-color: var(--c-cyan); box-shadow: 0 0 10px rgba(0,240,255,0.2); }
 
-        .astral-logo {
-            font-size: 3rem;
-            color: var(--hsr-gold);
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px var(--hsr-gold);
+        /* BOTTOM NAV (BLUE ARCHIVE STYLE) */
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+            background: rgba(0,0,0,0.95); border-top: 1px solid var(--c-cyan);
+            display: flex; justify-content: space-around; align-items: center;
+            padding-bottom: env(safe-area-inset-bottom); z-index: 100;
         }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 100%; height: 100%; color: #666; transition: 0.3s;
+        }
+        .nav-item.active { color: var(--c-cyan); background: linear-gradient(to top, rgba(0,240,255,0.1), transparent); }
+        .nav-icon { font-size: 1.4rem; margin-bottom: 3px; }
+        .nav-label { font-size: 0.6rem; font-family: 'Orbitron'; letter-spacing: 1px; }
 
-        .warp-text {
-            color: var(--hsr-gold-light);
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+        /* MODAL SUCCESS */
+        #modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
         }
+        .modal-box {
+            width: 85%; background: #111; border: 2px solid var(--c-gold);
+            padding: 30px; text-align: center; transform: scale(0.8); opacity: 0; position: relative;
+        }
+        .modal-corner { position: absolute; width: 10px; height: 10px; border: 2px solid var(--c-cyan); }
+        .tl {top: -2px; left: -2px; border-right: none; border-bottom: none;}
+        .br {bottom: -2px; right: -2px; border-left: none; border-top: none;}
 
-        .tap-hint {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            opacity: 0.7;
-            animation: pulse 1.5s infinite;
-        }
+        /* ANIMATIONS */
+        @keyframes spinHex { 100% {transform: rotate(360deg);} }
+        @keyframes loadBar { 0%{left:0; width:0;} 50%{width:50%;} 100%{left:100%; width:0;} }
+        @keyframes glitch-anim { 0%{transform: translate(2px,0)} 20%{transform: translate(-2px,0)} 40%{transform: translate(0,2px)} 60%{transform: translate(0,-2px)} 80%{transform: translate(0,0)} }
+        @keyframes popIn { to { transform: scale(1); opacity: 1; } }
 
-        /* --- FLASH EFFECT --- */
-        #flash-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white; /* Màu cầu vồng 5 sao nếu muốn phức tạp hơn */
-            z-index: 200;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* --- MAIN INVITATION CARD --- */
-        #invitation-card {
-            z-index: 50;
-            width: 90%;
-            max-width: 500px;
-            background: rgba(15, 21, 40, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0 20px 0 20px; /* Góc chéo đặc trưng */
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-            padding: 2rem;
-            position: relative;
-            display: none; /* Ẩn ban đầu */
-            opacity: 0;
-            transform: translateY(20px);
-            backdrop-filter: blur(10px);
-        }
-
-        #invitation-card::before {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(45deg, transparent, var(--hsr-gold), transparent);
-            z-index: -1;
-            border-radius: 0 20px 0 20px;
-            opacity: 0.5;
-        }
-
-        .header-section {
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .mission-badge {
-            background: var(--hsr-gold);
-            color: var(--hsr-dark);
-            padding: 5px 15px;
-            font-size: 0.8rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            display: inline-block;
-            transform: skew(-15deg);
-            margin-bottom: 10px;
-        }
-        
-        .mission-badge span {
-            display: block;
-            transform: skew(15deg);
-        }
-
-        h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.8rem;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .sub-title {
-            color: var(--hsr-gold-light);
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-
-        .content-section {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .info-row {
-            display: flex;
-            align-items: center;
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-radius: 5px;
-            border-left: 3px solid var(--hsr-gold);
-        }
-
-        .icon {
-            font-size: 1.5rem;
-            margin-right: 15px;
-            color: var(--hsr-accent);
-            width: 30px;
-            text-align: center;
-        }
-
-        .info-text strong {
-            display: block;
-            color: var(--hsr-text);
-            font-size: 1rem;
-        }
-
-        .info-text span {
-            font-size: 0.85rem;
-            color: #aaa;
-        }
-
-        .character-img {
-            position: absolute;
-            right: -60px;
-            top: -50px;
-            width: 150px;
-            opacity: 0.8;
-            pointer-events: none;
-            /* Bạn có thể thay bằng ảnh chibi Pom-pom hoặc nhân vật khác */
-        }
-
-        .action-btn {
-            margin-top: 2rem;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(90deg, var(--hsr-gold) 0%, #b88a38 100%);
-            border: none;
-            color: var(--hsr-dark);
-            font-weight: 800;
-            font-size: 1rem;
-            text-transform: uppercase;
-            cursor: pointer;
-            border-radius: 2px 15px 2px 15px;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .action-btn:hover {
-            filter: brightness(1.2);
-            box-shadow: 0 0 15px var(--hsr-gold);
-        }
-
-        .footer {
-            margin-top: 1rem;
-            text-align: center;
-            font-size: 0.7rem;
-            color: #555;
-            letter-spacing: 1px;
-        }
-
-        /* --- ANIMATIONS --- */
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.7; }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes rainbow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            #invitation-card {
-                width: 95%;
-                padding: 1.5rem;
-            }
-            .character-img {
-                width: 100px;
-                right: -20px;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <audio id="bg-music" loop>
-        <source src="https://ia801402.us.archive.org/16/items/ed-sheeran-perfect-official-music-video/Ed%20Sheeran%20-%20Perfect%20%28Official%20Music%20Video%29.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="sfx-glitch"> <source src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3" type="audio/mpeg"> </audio>
+    <audio id="bgm" loop> <source src="https://ia804603.us.archive.org/21/items/blue-archive-ost-3-constant-moderato/Blue%20Archive%20OST%203%20Constant%20Moderato.mp3" type="audio/mpeg"> </audio>
+    
+    <div onclick="toggleAudio()" style="position: fixed; top: 20px; right: 20px; z-index: 200; width: 40px; height: 40px; border: 1px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">🎵</div>
 
-    <div id="flash-overlay"></div>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
 
-    <div id="warp-screen">
-        <div class="ticket-container" onclick="performWarp()">
-            <div class="ticket-inner">
-                <div class="astral-logo">✦</div>
-                <div class="warp-text">VÉ MỜI ĐẶC BIỆT</div>
-                <div style="font-size: 0.7rem; color: #aaa; margin-top:5px;">Star Rail Pass</div>
-            </div>
-        </div>
-        <div class="tap-hint">Chạm để Khai Phá</div>
+    <div id="boot-layer">
+        <div class="hex-loader"></div>
+        <div class="boot-text" id="boot-txt">SYSTEM INITIALIZING...</div>
     </div>
 
-    <div id="invitation-card">
-        <div style="position: absolute; top: 10px; right: 10px; color: #fff; font-size: 0.7rem; border: 1px solid #fff; padding: 2px 5px; opacity: 0.5;">NO.2026</div>
+    <div id="app">
+        <header class="header">
+            <div class="h-title">ARCHIVE // 12A1</div>
+            <div class="h-badge">PROTOCOL: OMEGA</div>
+        </header>
 
-        <div class="header-section">
-            <div class="mission-badge"><span>NHIỆM VỤ ĐỒNG HÀNH</span></div>
-            <h1>KỶ YẾU LỚP 12A1</h1>
-            <p class="sub-title">"Hành trình vạn dặm bắt đầu từ hôm nay"</p>
+        <div class="viewport">
+            
+            <div id="tab-1" class="tab-content">
+                <div class="tech-card terminal-box">
+                    <div class="card-head" style="justify-content: center; border: none; color: var(--c-cyan);">✦ NEURAL CLOUD LINK ✦</div>
+                    
+                    <div id="rarity-disp" class="rarity-badge">---</div>
+                    <div id="msg-disp" class="msg-content">AWAITING INPUT...</div>
+                    
+                    <button class="breach-btn" onclick="breachSystem()">
+                        BREACH PROTOCOL
+                    </button>
+                    <div style="margin-top: 10px; font-size: 0.7rem; color: #666; font-family: 'Share Tech Mono';">
+                        COST: 0 BIT // CHANCE: 100%
+                    </div>
+                </div>
+
+                <div class="tech-card">
+                    <div class="card-head">
+                        <span>ℹ MISSION BRIEFING</span>
+                        <span style="font-size: 0.7rem; color: var(--c-gold);">[URGENT]</span>
+                    </div>
+                    <p style="color: #ccc; line-height: 1.6; font-size: 0.95rem;">
+                        "Hệ thống phát hiện thời gian <strong style="color:var(--c-gold)">Thanh Xuân</strong> đang đếm ngược. Toàn bộ Operator 12A1 cần tập hợp ngay để sao lưu ký ức vào máy chủ vĩnh cửu."
+                    </p>
+                </div>
+            </div>
+
+            <div id="tab-2" class="tab-content" style="display: none;">
+                <div class="tech-card" style="border-color: var(--c-gold);">
+                    <div class="card-head" style="color: var(--c-gold);">⚙ MISSION PARAMETERS</div>
+                    
+                    <div class="stat-row">
+                        <span class="stat-label">TARGET</span>
+                        <span class="stat-val" style="color: var(--c-cyan)">YEARBOOK 2026</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">H-HOUR</span>
+                        <span class="stat-val">08:00 | 20.05.2026</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">SECTOR ALPHA</span>
+                        <span class="stat-val">TRƯỜNG THPT [TÊN]</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">SECTOR BETA</span>
+                        <span class="stat-val">PHIM TRƯỜNG GALAXY</span>
+                    </div>
+                    <div class="stat-row" style="border: none;">
+                        <span class="stat-label">LOADOUT</span>
+                        <span class="stat-val">VEST / ÁO DÀI</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-3" class="tab-content" style="display: none;">
+                <div class="tech-card" style="border-color: var(--c-pink);">
+                    <div class="card-head" style="color: var(--c-pink);">⚠ ENLISTMENT</div>
+                    <p style="color: #888; font-family: 'Share Tech Mono'; font-size: 0.8rem; margin-bottom: 15px;">
+                        // INPUT DATA TO CONFIRM SLOT
+                    </p>
+                    
+                    <input type="text" class="cyber-input" placeholder="> CODENAME (HỌ TÊN)...">
+                    <input type="text" class="cyber-input" placeholder="> FREQUENCY (SĐT)...">
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <button class="cyber-input" style="text-align: center; color: var(--c-cyan);">ASSAULT</button>
+                        <button class="cyber-input" style="text-align: center;">SUPPORT</button>
+                    </div>
+
+                    <button class="breach-btn" style="background: var(--c-cyan); color: #000; box-shadow: 4px 4px 0 rgba(0,240,255,0.3);" onclick="submitData()">
+                        CONFIRM DEPLOY
+                    </button>
+                </div>
+            </div>
+
         </div>
 
-        <div class="content-section">
-            <div class="info-row">
-                <div class="icon">📅</div>
-                <div class="info-text">
-                    <strong>THỜI GIAN</strong>
-                    <span>08:00 Sáng - Chủ Nhật, 20/05/2026</span>
-                </div>
+        <nav class="nav-bar">
+            <div class="nav-item active" onclick="switchTab(1, this)">
+                <div class="nav-icon">❖</div>
+                <div class="nav-label">SYSTEM</div>
             </div>
-
-            <div class="info-row">
-                <div class="icon">📍</div>
-                <div class="info-text">
-                    <strong>ĐỊA ĐIỂM</strong>
-                    <span>Trường THPT [Tên Trường Của Bạn]</span>
-                    <span>& Phim trường [Tên Phim Trường]</span>
-                </div>
+            <div class="nav-item" onclick="switchTab(2, this)">
+                <div class="nav-icon">⌖</div>
+                <div class="nav-label">INTEL</div>
             </div>
-
-            <div class="info-row">
-                <div class="icon">👗</div>
-                <div class="info-text">
-                    <strong>DRESSCODE</strong>
-                    <span>Nam: Vest/Sơ mi trắng - Nữ: Áo dài/Váy</span>
-                </div>
+            <div class="nav-item" onclick="switchTab(3, this)">
+                <div class="nav-icon">◈</div>
+                <div class="nav-label">JOIN</div>
             </div>
-        </div>
+        </nav>
+    </div>
 
-        <button class="action-btn" onclick="confirmAttendance()">
-            ✦ XÁC NHẬN THAM GIA ✦
-        </button>
-
-        <div class="footer">
-            MAY THIS JOURNEY LEAD US STARWARD
+    <div id="modal">
+        <div class="modal-box">
+            <div class="modal-corner tl"></div><div class="modal-corner br"></div>
+            <div style="font-size: 3rem; color: var(--c-gold); margin-bottom: 10px; text-shadow: 0 0 20px var(--c-gold);">★ ★ ★ ★ ★</div>
+            <h2 style="font-family: 'Orbitron'; color: #fff;">MISSION ACCEPTED</h2>
+            <p style="color: #aaa; margin: 15px 0;">Dữ liệu Operator đã được đồng bộ lên máy chủ Neural Cloud.</p>
+            <button onclick="document.getElementById('modal').style.display='none'" class="cyber-input" style="width: auto; padding: 10px 30px; margin: 0; cursor: pointer;">DISMISS</button>
         </div>
     </div>
 
     <script>
-        function performWarp() {
-            const warpScreen = document.getElementById('warp-screen');
-            const flash = document.getElementById('flash-overlay');
-            const card = document.getElementById('invitation-card');
-            const music = document.getElementById('bg-music');
+        // --- 1. BOOT SEQUENCE ---
+        const logs = ["CONNECTING...", "BYPASSING FIREWALL...", "ACCESS GRANTED."];
+        let i = 0;
+        function boot() {
+            if(i < logs.length) {
+                document.getElementById('boot-txt').innerText = logs[i]; i++;
+                setTimeout(boot, 600);
+            } else {
+                document.getElementById('boot-layer').style.display = 'none';
+                document.getElementById('app').style.display = 'flex';
+                setTimeout(()=>document.getElementById('app').style.opacity = 1, 50);
+                breachSystem(); // Auto roll first message
+            }
+        }
+        window.onload = boot;
 
-            // 1. Chơi nhạc (nếu trình duyệt cho phép)
-            music.volume = 0.5;
-            music.play().catch(e => console.log("Cần tương tác để phát nhạc"));
+        // --- 2. MATRIX RAIN EFFECT ---
+        const cvs = document.getElementById('matrix-canvas');
+        const ctx = cvs.getContext('2d');
+        cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+        const chars = "10XYZ01";
+        const drops = Array(Math.floor(cvs.width/10)).fill(1);
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,cvs.width,cvs.height);
+            ctx.fillStyle = "#0F0"; ctx.font = "10px monospace";
+            drops.forEach((y,i) => {
+                const text = chars[Math.floor(Math.random()*chars.length)];
+                ctx.fillText(text, i*10, y*10);
+                if(y*10 > cvs.height && Math.random()>0.98) drops[i]=0;
+                drops[i]++;
+            });
+        }
+        setInterval(drawMatrix, 50);
 
-            // 2. Hiệu ứng rung lắc vé
-            const ticket = document.querySelector('.ticket-container');
-            ticket.style.transform = "scale(0.9)";
+        // --- 3. DATABASE (50+ QUOTES) ---
+        const db = [
+            // COMMON (Blue Archive Style)
+            {t: "Nhiệm vụ hàng ngày: Chụp một tấm ảnh để đời cùng 12A1.", r: "COMMON", c: "var(--c-cyan)"},
+            {t: "Đừng để thanh xuân bị 'lag'. Hãy đến và lưu lại khoảnh khắc này.", r: "COMMON", c: "var(--c-cyan)"},
+            {t: "Server 'Thanh Xuân' sắp bảo trì vĩnh viễn.", r: "COMMON", c: "var(--c-cyan)"},
+            {t: "Cảnh báo: Mức độ 'đẹp trai' của lớp đang giảm. Cần buff.", r: "COMMON", c: "var(--c-cyan)"},
+            {t: "Sensei đã gửi tín hiệu triệu tập.", r: "COMMON", c: "var(--c-cyan)"},
+            {t: "Đừng trốn nữa, vệ tinh đã định vị được bạn rồi.", r: "COMMON", c: "var(--c-cyan)"},
+            {t: "Tải lên nụ cười của bạn để hoàn tất cơ sở dữ liệu lớp.", r: "COMMON", c: "var(--c-cyan)"},
+            {t: "Không đi kỷ yếu là mất 1000 Nguyên Thạch cuộc đời đấy!", r: "COMMON", c: "var(--c-cyan)"},
+            {t: "Nhiệm vụ phụ: Ăn hết đồ ăn ở buổi chụp.", r: "COMMON", c: "var(--c-cyan)"},
+            {t: "Đã hack vào lịch trình của bạn. Ngày 20/05 bạn bận rồi.", r: "COMMON", c: "var(--c-cyan)"},
+            
+            // RARE (Emotional)
+            {t: "Có những nụ cười chỉ tồn tại ở tuổi 18. Đừng bỏ lỡ.", r: "RARE", c: "var(--c-gold)"},
+            {t: "Ba năm là hữu hạn, nhưng kỷ niệm là vô hạn.", r: "RARE", c: "var(--c-gold)"},
+            {t: "Chúng ta là những đoạn code tình cờ gặp nhau trong cùng một chương trình.", r: "RARE", c: "var(--c-gold)"},
+            {t: "Thời gian là hacker tàn nhẫn nhất. Nó sẽ xóa sạch ký ức nếu không lưu lại.", r: "RARE", c: "var(--c-gold)"},
+            {t: "Sau này, thứ chúng ta nhìn lại không phải là ảnh, mà là cảm xúc lúc đó.", r: "RARE", c: "var(--c-gold)"},
+            {t: "Một ngày nào đó ở năm 2077, bạn sẽ mỉm cười khi nhìn lại tấm ảnh này.", r: "RARE", c: "var(--c-gold)"},
+            {t: "Đừng để avatar của bạn offline trong bức ảnh quan trọng nhất.", r: "RARE", c: "var(--c-gold)"},
+            {t: "Hãy để lại một 'dấu vết điện tử' thật rực rỡ trước khi log out.", r: "RARE", c: "var(--c-gold)"},
+
+            // LEGENDARY (Honkai/Cyberpunk)
+            {t: "Hỡi Nhà Khai Phá, chuyến tàu Astral cuối cùng sắp khởi hành.", r: "SSR", c: "var(--c-pink)"},
+            {t: "Giao thức OMEGA kích hoạt: Tập hợp toàn bộ đơn vị 12A1.", r: "SSR", c: "var(--c-pink)"},
+            {t: "Wake up, Samurai. We have a yearbook to shoot.", r: "SSR", c: "var(--c-pink)"},
+            {t: "Đây không phải là kết thúc. Đây là sự khởi đầu của huyền thoại.", r: "SSR", c: "var(--c-pink)"},
+            {t: "Nguyện cho hành trình này dẫn lối chúng ta về phía những vì sao.", r: "SSR", c: "var(--c-pink)"},
+            {t: "Dữ liệu linh hồn của bạn đã được chọn để đồng bộ hóa vĩnh viễn.", r: "SSR", c: "var(--c-pink)"},
+            {t: "Băng qua tường lửa của sự lười biếng. Mục tiêu là bức ảnh để đời.", r: "SSR", c: "var(--c-pink)"},
+            {t: "Trong thành phố Night City của ký ức, bức ảnh này sẽ là tòa tháp sáng nhất.", r: "SSR", c: "var(--c-pink)"}
+        ];
+
+        // --- 4. SYSTEM LOGIC ---
+        function breachSystem() {
+            // SFX
+            const sfx = document.getElementById('sfx-glitch'); sfx.currentTime=0; sfx.play();
+            
+            // DOM Elements
+            const msg = document.getElementById('msg-disp');
+            const rar = document.getElementById('rarity-disp');
+            const box = document.querySelector('.terminal-box');
+            
+            // Glitch Effect Start
+            msg.innerText = "DECRYPTING SIGNAL...";
+            msg.classList.add('glitch-text');
+            rar.innerText = "...";
+            rar.style.color = "#555";
             
             setTimeout(() => {
-                // 3. Flash sáng (Giả lập màn hình cầu vồng 5 sao)
-                flash.style.transition = "opacity 0.5s ease";
-                flash.style.opacity = "1";
-
-                // Đổi màu nền flash thành màu vàng 5 sao rồi nhạt dần
-                setTimeout(() => {
-                    flash.style.background = "linear-gradient(135deg, #fff 0%, #DAB568 50%, #fff 100%)";
-                }, 200);
-
-                setTimeout(() => {
-                    // 4. Ẩn màn hình warp, hiện thiệp
-                    warpScreen.style.display = 'none';
-                    card.style.display = 'block';
-                    card.style.animation = "slideUp 1s cubic-bezier(0.19, 1, 0.22, 1) forwards";
-                    
-                    // 5. Tắt flash
-                    flash.style.opacity = "0";
-                    setTimeout(() => { flash.style.display = 'none'; }, 500);
-                }, 1500); // Thời gian chờ flash
-            }, 300);
+                const item = db[Math.floor(Math.random()*db.length)];
+                
+                msg.classList.remove('glitch-text');
+                msg.innerText = `"${item.t}"`;
+                
+                rar.innerText = item.r;
+                rar.style.color = item.c;
+                rar.style.textShadow = `0 0 20px ${item.c}`;
+                
+                box.style.borderColor = item.c;
+                box.style.boxShadow = `0 0 30px ${item.c}30`;
+            }, 500);
         }
 
-        function confirmAttendance() {
-            // Thay link Google Form hoặc Facebook của bạn vào đây
-            window.location.href = "https://www.facebook.com/"; 
-            alert("Đang chuyển đến trang đăng ký...");
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.getElementById(`tab-${id}`).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function submitData() {
+            const btn = document.querySelector('#tab-3 .breach-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "UPLOADING...";
+            setTimeout(() => {
+                document.getElementById('modal').style.display = 'flex';
+                document.querySelector('.modal-box').style.animation = 'popIn 0.3s forwards';
+                btn.innerText = "DEPLOYED";
+            }, 1000);
+        }
+
+        function toggleAudio() {
+            const bgm = document.getElementById('bgm');
+            bgm.paused ? bgm.play() : bgm.pause();
         }
     </script>
 </body>
